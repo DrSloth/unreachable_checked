@@ -1,5 +1,5 @@
 # unreachable_checked!
-A fork of [Kixunil/dont_panic](https://github.com/Kixunil/dont_panic)
+A fork of [Kixunil/dont_panic](https://github.com/Kixunil/dont_panic) that uses unreachable! instead of panic!
 
 Ensures that code can't panic at compile time.
 
