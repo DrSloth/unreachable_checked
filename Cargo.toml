@@ -1,6 +1,6 @@
 [package]
 name = "unreachable_checked"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Hassan Abu-Jabir <hassan@pandaloop.de>"]
 license = "MITNFA"
 description = "unreachable!()-like macro that causes linking error instead of panicking. May be used to statically ensure some code won't panic."
