@@ -1,23 +1,23 @@
-//! This crate provides macros that look just like `panic!()` but instead of panicking, they cause a
-//! linking error if their calls are not optimized-out. This can be used to ensure the compiler
-//! optimizes away some code.
+//! This crate provides macros that look just like `unreachable!()` but instead of panicking,
+//! they cause a  linking error if their calls are not optimized-out. 
+//! This can be used to ensure the compiler optimizes away some code.
 //!
 //! # Example
 //!
 //! ```no_compile
 //! #[macro_use]
-//! extern crate dont_panic;
+//! extern crate unreachable_checked;
 //!
 //! fn main() {
 //! /*
 //!     let x = 6 * 9;
 //!     if x == 42 {
-//!         dont_panic!("6 * 9 == 42");
+//!         unreachable_checked!("6 * 9 == 42");
 //!     }
 //! */
 //! let x = false;
 //! if x {
-//!     dont_panic!("42");
+//!     unreachable_checked!("42");
 //! }
 //! }
 //! ```
@@ -38,7 +38,7 @@ extern "C" {
 /// This should be used only in cases you are absolutely sure are OK and optimizable by compiler.
 #[cfg(not(feature = "panic"))]
 #[macro_export]
-macro_rules! dont_panic {
+macro_rules! unreachable_checked {
     ($($x:tt)*) => ({
         unsafe { $crate::rust_panic_called_where_shouldnt(); }
     })
@@ -48,36 +48,36 @@ macro_rules! dont_panic {
 /// causing a linking error. The purpose is to make development easier. (E.g. in debug mode.)
 #[cfg(feature = "panic")]
 #[macro_export]
-macro_rules! dont_panic {
+macro_rules! unreachable_checked {
     ($($x:tt)*) => ({
-        panic!($($x)*);
+        unreachable!($($x)*);
     })
 }
 
-/// Like assert but calls `dont_panic!()` instead of `panic!()`
+/// Like assert but calls `unreachable_checked!()` instead of `unreachable!()`
 #[macro_export]
 macro_rules! dp_assert {
     ($cond:expr) => (
         if !$cond {
-            dont_panic!(concat!("assertion failed: ", stringify!($cond)))
+            unreachable_checked!(concat!("assertion failed: ", stringify!($cond)))
         }
     );
 
     ($cond:expr, $($arg:tt)+) => (
         if !$cond {
-            dont_panic!($($arg)+)
+            unreachable_checked!($($arg)+)
         }
     );
 }
 
 /// This function calls the given closure, asserting that there's no possibility of panicking.
-/// If the compiler can't prove this, the code will be left with a `dont_panic!` linking error.
+/// If the compiler can't prove this, the code will be left with a `unreachable_checked!` linking error.
 #[cfg(not(feature = "panic"))]
 pub fn call<T, F: FnOnce() -> T>(f: F) -> T {
     struct DontPanic;
     impl Drop for DontPanic {
         fn drop(&mut self) {
-            dont_panic!();
+            unreachable_checked!();
         }
     }
 
@@ -100,7 +100,7 @@ mod tests {
     fn it_works() {
         let should_panic = false;
         if should_panic {
-            dont_panic!();
+            unreachable_checked!();
         }
     }
 
@@ -116,7 +116,7 @@ mod tests {
     fn panic() {
         let should_panic = true;
         if should_panic {
-            dont_panic!();
+            unreachable_checked!();
         }
     }
 
@@ -125,7 +125,7 @@ mod tests {
     fn no_panic() {
         let should_panic = false;
         if should_panic {
-            dont_panic!();
+            unreachable_checked!();
         }
     }
 
